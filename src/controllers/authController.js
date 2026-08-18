@@ -187,6 +187,46 @@ const authController = {
             return response.status(status).json({ message: error.message });
         }
     },
+
+    /**
+     * @swagger
+     * /auth/me:
+     *   get:
+     *     summary: Get the currently authenticated user
+     *     tags: [Auth]
+     *     security:
+     *       - cookieAuth: []
+     *     responses:
+     *       200:
+     *         description: Returns the current user from the JWT cookie
+     *       401:
+     *         description: Not authenticated
+     */
+    me: (request, response) => {
+        // request.user is set by authMiddleware.protect
+        return response.status(200).json({ user: request.user });
+    },
+
+    /**
+     * @swagger
+     * /auth/logout:
+     *   post:
+     *     summary: Logout — clears the JWT cookie
+     *     tags: [Auth]
+     *     responses:
+     *       200:
+     *         description: Cookie cleared successfully
+     */
+    logout: (request, response) => {
+        const isProd = process.env.NODE_ENV === 'production';
+        response.clearCookie('jwtToken', {
+            httpOnly: true,
+            secure: isProd,
+            sameSite: isProd ? 'none' : 'lax',
+            path: '/',
+        });
+        return response.status(200).json({ message: 'Logged out successfully' });
+    },
 };
 
 module.exports = authController;
