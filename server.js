@@ -14,6 +14,19 @@ const productRoutes = require('./src/routes/productRoutes');
 const app = express();
 const PORT = process.env.PORT || 5001;
 
+// ── Startup env check ─────────────────────────────────────────────────────────
+const REQUIRED_ENV = ['MONGO_URI', 'JWT_SECRET', 'CLIENT_ORIGIN'];
+const missing = REQUIRED_ENV.filter((k) => !process.env[k]);
+if (missing.length) {
+    console.error(`FATAL: Missing required environment variables: ${missing.join(', ')}`);
+    process.exit(1);
+}
+console.log(`[env] NODE_ENV      = ${process.env.NODE_ENV}`);
+console.log(`[env] CLIENT_ORIGIN = ${process.env.CLIENT_ORIGIN}`);
+console.log(`[env] SERVER_URL    = ${process.env.SERVER_URL}`);
+console.log(`[env] MONGO_URI     = ${process.env.MONGO_URI?.replace(/:([^@]+)@/, ':***@')}`);
+console.log(`[env] JWT_SECRET    = ${process.env.JWT_SECRET ? '(set)' : '(NOT SET)'}`);
+
 // ── Database ──────────────────────────────────────────────────────────────────
 connectDB();
 
